@@ -4,8 +4,17 @@ if (Meteor.isClient) {
     //This code only runs on the client
     Template.body.helpers({
 	    tasks: function() {
-		return Tasks.find({});
-	    }
+		if (Session.get("hideCompleted")) {
+		    //If hide completed is checked, filter tasks
+		    return Tasks.find({checked: {$ne: true}}, {sort: {createdAt: -1}});
+		} else {
+		    //Otherwise, return all of the tasks
+		    return Tasks.find({}, {sort: {createdAt: -1}});
+		}
+	    },
+		hideCompleted: function () {
+		return Session.get("hideCompleted")
+		    }  
 	});
     
     //Create a new task
@@ -23,7 +32,11 @@ if (Meteor.isClient) {
 
 		//Prevent default form submit
 		return false;
-	    } 
+	    },
+	    //Function to hide completed tasks
+	    "change .hide-completed input": function (event) {
+		Session.set("hideCompleted", event.target.checked);
+	    }
 	});
 
 
