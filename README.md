@@ -1,6 +1,6 @@
 # To dos
   
-  ## Features:
+## Features:
   - Add task
   - Delete task
   - Update task
@@ -8,4 +8,4 @@
 
 
 ## URL:
-   (https://charlestodolist.meteor.com/)[Charles to do list]
+ [Charles to do list](https://charlestodolist.meteor.com/)
