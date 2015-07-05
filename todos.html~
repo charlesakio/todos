@@ -6,6 +6,9 @@
   <div class="container">
     <header>
       <h1> To do list</h1>
+      <form class="new-task">
+	<input type="text" name="text" placeholder="Enter your task">
+      </form>
     </header>
     <ul>
       {{#each tasks}}
