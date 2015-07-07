@@ -5,13 +5,22 @@
 <body>
   <div class="container">
     <header>
-      <h1> To do lis {{incompleteCount}}t</h1
->
+      <h1> To do list {{incompleteCount}}</h1>
       <label class="hide-completed">
 	<input type="checkbox" checked="{{hideCompleted}}" />
 	Hide Completed Tasks
       </label>
-
+      
+      {{#if isOwner}}
+      <button class="toggle-private">
+	{{#if private}}
+	   Private
+	{{else}}
+	   Public
+	{{/if}}
+      </button>
+      {{/if}}
+     
       {{> loginButtons}}
 
       {{#if currentUser}}
@@ -31,7 +40,7 @@
 </body>
 
 <template name="task">
-  <li class="{{#if checked}}checked{{/if}}">
+  <li class="{{#if checked}}checked{{/if}} {{#if private}}private{{/if}}">
     <button class="delete">&times;</button>
     
     <input type="checkbox" checked="{{checked}}" class="toggle-checked" />

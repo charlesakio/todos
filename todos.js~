@@ -2,6 +2,9 @@ Tasks = new Mongo.Collection("tasks");
 
 if (Meteor.isClient) {
     //This code only runs on the client
+    Meteor.subscribe("tasks");
+
+
     Template.body.helpers({
 	    tasks: function() {
 		if (Session.get("hideCompleted")) {
@@ -13,8 +16,8 @@ if (Meteor.isClient) {
 		}
 	    },
 		hideCompleted: function () {
-		return Session.get("hideCompleted")
-		    }  
+		return Session.get("hideCompleted");
+	    }  
 	});
     
     //Create a new task
@@ -23,7 +26,7 @@ if (Meteor.isClient) {
 		//Function aboved is called when the new task form is submitted
 		var text = event.target.text.value;
 		
-		Meteor.call(addTask, text);
+		Meteor.call("addTask", text);
 		
 		//Clear form
 		event.target.text.value = "";
@@ -52,30 +55,37 @@ if (Meteor.isClient) {
     Accounts.ui.config({
 	    passwordSignupFields: "USERNAME_ONLY"
 		});		
-    
-    //Methods
-    Meteor.methods({
-	    addTask: function (text) {
-		//Making sure the user is logged in before inserting task
-		if (!Meteor.userId) {
-		    throw new Meteor.error("not-authorized");
-		}
-		//If there is no error, insert to database 
-		Tasks.insert({
-			text: text,
-			    createdAt: new Date(),
-			    owner: Meteor.userId(),
-			    username: Meteor.user().username
-			    });
-	    },
-		//Delete task
-		deleteTask: function (taskId) {
-		Tasks.remove(taskId);
-	    },
-		//Update task
-		setChecked: function (taskId, setChecked) {
-		Tasks.update(taskId, {$set: { checked: setChecked }});
+}
+
+
+//Methods
+Meteor.methods({
+	addTask: function (text) {
+	    //Making sure the user is logged in before inserting task
+	    if (!Meteor.userId) {
+		throw new Meteor.error("not-authorized");
 	    }
+	    //If there is no error, insert to database 
+	    Tasks.insert({
+		    text: text,
+			createdAt: new Date(),
+			owner: Meteor.userId(),
+			username: Meteor.user().username
+			});
+	},
+	    //Delete task
+	    deleteTask: function (taskId) {
+	    Tasks.remove(taskId);
+	},
+	    //Update task
+	    setChecked: function (taskId, setChecked) {
+	    Tasks.update(taskId, {$set: { checked: setChecked }});
+	}
+    });
+
+if (Meteor.isServer) {
+    Meteor.publish("tasks", function () {
+	    return Tasks.find();
 	});
 }
 

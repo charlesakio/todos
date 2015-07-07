@@ -2,6 +2,9 @@ Tasks = new Mongo.Collection("tasks");
 
 if (Meteor.isClient) {
     //This code only runs on the client
+    Meteor.subscribe("tasks");
+
+
     Template.body.helpers({
 	    tasks: function() {
 		if (Session.get("hideCompleted")) {
@@ -46,13 +49,25 @@ if (Meteor.isClient) {
 		// Delete task
 		"click .delete": function () {
 		    Meteor.call("deleteTask", this._id);
-		}
+		},
+		    
+		    //An event for the new button to Template.task.events
+		    "click.toggle-private": function () {
+			Meteor.call("setPrivate", this._id, ! this.private);
+		    }
+		    
 	});   
     
     Accounts.ui.config({
 	    passwordSignupFields: "USERNAME_ONLY"
 		});		
 }
+
+Template.tasks.helpers({
+	isOwner: function() {
+	    return this.owner === Meteor.userId();
+	}
+    });
 
 
 //Methods
@@ -72,12 +87,42 @@ Meteor.methods({
 	},
 	    //Delete task
 	    deleteTask: function (taskId) {
+	    
+	    var task = Tasks.findOne(taskId);
+	    if (task.private && task.owner !== Meteor.userId()) {
+		throw new Meteor.Error("You shall not pass!!!");
+	    }
 	    Tasks.remove(taskId);
 	},
 	    //Update task
 	    setChecked: function (taskId, setChecked) {
+	    	    	    
+	    var task = Tasks.findOne(taskId);
+	    if (task.private && task.owner !== Meteor.userId()) {
+		throw new Meteor.Error("You shall not pass!!!");
+	    }
 	    Tasks.update(taskId, {$set: { checked: setChecked }});
+	},
+	    //Make task private
+	    setPrivate: function (taskId, setToPrivate) {
+	    
+	    var task = Tasks.findOne(taskId);
+	    //Making sure that only task owner can make a task private
+	    if (task.owner !== Meteor.userId()) {
+		throw new Meteor.Error("You shall not pass!!!");
+	    }
+	    Tasks.update(taskId, { $set: { private: setToPrivate } });
 	}
     });
 
+if (Meteor.isServer) {
+    Meteor.publish("tasks", function () {
+	    return Tasks.find({
+		    $or: [
+			  { private: {$ne: true} },
+			  { owner: this.userId}
+			  ]
+			});
+	});
+}
 
