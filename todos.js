@@ -25,8 +25,10 @@ if (Meteor.isClient) {
 		
 		Tasks.insert({
 			text: text,
-			    createdAt: new Date() //Current date
-		    });
+			    createdAt: new Date(), //Current date
+			    owner: Meteor.userId(),
+			    username: Meteor.user().username	      
+			    });
 		//Clear form
 		event.target.text.value = "";
 
@@ -48,7 +50,11 @@ if (Meteor.isClient) {
 		"click .delete": function () {
 		    Tasks.remove(this._id);
 		}
-	});
+	});   
 
+	Accounts.ui.config({
+		passwordSignupFields: "USERNAME_ONLY"
+    });		
+    
 }
 

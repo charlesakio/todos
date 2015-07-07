@@ -6,10 +6,11 @@
   <div class="container">
     <header>
       <h1> To do list</h1>
-      <label>
-	<input type="checkbox" checked="{{hidecompleted}}" />
+      <label class="hide-completed">
+	<input type="checkbox" checked="{{hideCompleted}}" />
 	Hide Completed Tasks
       </label>
+      {{> loginButtons}}
       <form class="new-task">
 	<input type="text" name="text" placeholder="Enter your task">
       </form>
