@@ -5,18 +5,23 @@
 <body>
   <div class="container">
     <header>
-      <h1> To do list</h1>
+      <h1> To do lis {{incompleteCount}}t</h1
+>
       <label class="hide-completed">
 	<input type="checkbox" checked="{{hideCompleted}}" />
 	Hide Completed Tasks
       </label>
+
       {{> loginButtons}}
+
       {{#if currentUser}}
       <form class="new-task">
 	<input type="text" name="text" placeholder="Enter your task">
       </form>
+
       {{/if}}
     </header>
+
     <ul>
       {{#each tasks}}
         {{> task}}
@@ -28,7 +33,7 @@
 <template name="task">
   <li class="{{#if checked}}checked{{/if}}">
     <button class="delete">&times;</button>
-
+    
     <input type="checkbox" checked="{{checked}}" class="toggle-checked" />
 
     <span class="text"><strong>{{username}}</strong> - {{text}}</span>

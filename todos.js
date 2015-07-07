@@ -13,8 +13,8 @@ if (Meteor.isClient) {
 		}
 	    },
 		hideCompleted: function () {
-		return Session.get("hideCompleted")
-		    }  
+		return Session.get("hideCompleted");
+	    }  
 	});
     
     //Create a new task
@@ -23,38 +23,61 @@ if (Meteor.isClient) {
 		//Function aboved is called when the new task form is submitted
 		var text = event.target.text.value;
 		
-		Tasks.insert({
-			text: text,
-			    createdAt: new Date(), //Current date
-			    owner: Meteor.userId(),
-			    username: Meteor.user().username	      
-			    });
+		Meteor.call("addTask", text);
+		
 		//Clear form
 		event.target.text.value = "";
-
+		
 		//Prevent default form submit
 		return false;
 	    },
-	    //Function to hide completed tasks
-	    "change .hide-completed input": function (event) {
-		Session.set("hideCompleted", event.target.checked);
-	    }
+		//Function to hide completed tasks
+		"change .hide-completed input": function (event) {
+		    Session.set("hideCompleted", event.target.checked);
+		}
 	});
-
-
+    
+    
     Template.task.events({
 	    "click .toggle-checked": function () {
 		// Set the checked property to the opposite of its current value
-		Tasks.update(this._id, {$set: {checked: ! this.checked}});
+		Meteor.call("setChecked", this._id, ! this.checked);
 	    },
+		// Delete task
 		"click .delete": function () {
-		    Tasks.remove(this._id);
+		    Meteor.call("deleteTask", this._id);
 		}
 	});   
-
-	Accounts.ui.config({
-		passwordSignupFields: "USERNAME_ONLY"
-    });		
     
+    Accounts.ui.config({
+	    passwordSignupFields: "USERNAME_ONLY"
+		});		
 }
+
+
+//Methods
+Meteor.methods({
+	addTask: function (text) {
+	    //Making sure the user is logged in before inserting task
+	    if (!Meteor.userId) {
+		throw new Meteor.error("not-authorized");
+	    }
+	    //If there is no error, insert to database 
+	    Tasks.insert({
+		    text: text,
+			createdAt: new Date(),
+			owner: Meteor.userId(),
+			username: Meteor.user().username
+			});
+	},
+	    //Delete task
+	    deleteTask: function (taskId) {
+	    Tasks.remove(taskId);
+	},
+	    //Update task
+	    setChecked: function (taskId, setChecked) {
+	    Tasks.update(taskId, {$set: { checked: setChecked }});
+	}
+    });
+
 
